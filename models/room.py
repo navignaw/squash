@@ -11,8 +11,8 @@ class Room(Object):
         pass
 
     def add_user(self, user):
-        if len(self.users) == 6:
-            raise Room.ExceededCapacityError
+        if len(self.users) == self.MAX_CAPACITY:
+            raise self.ExceededCapacityError
         self.users.append(user)
 
     def remove_user(self, user):
@@ -20,3 +20,6 @@ class Room(Object):
             self.users.remove(user)
         except ValueError:
             pass
+
+    def is_empty(self):
+        return len(self.users) == 0

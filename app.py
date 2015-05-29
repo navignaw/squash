@@ -2,7 +2,7 @@
 
 import os
 from flask import Flask, render_template
-#from flask.ext.socketio import SocketIO, emit, join_room, leave_room
+from flask.ext.socketio import SocketIO, emit, join_room, leave_room, close_room
 from parse_rest.connection import register
 
 from models.room import *
@@ -65,6 +65,8 @@ def on_leave_room(data, namespace='/server'):
     room = Room.Query.get(name=room_name)
     room.remove_user(username)
     leave_room(room_name)
+    if room.is_empty:
+        close_room(room_name)
     emit('response', {'data': username + ' has left the room.'}, room=room)
     emit('update_room', {'name': room_name, 'users': room.users}, broadcast=True)
 

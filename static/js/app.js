@@ -27,7 +27,8 @@ $(document).ready(function() {
     function displayRooms(rooms) {
         var joinRoom = function(room) {
             return function() {
-                $('#join-' + room.name).prop('disabled', true); // disable button
+                var $room = $('#' + room.name);
+                $room.children('.join-button').prop('disabled', true); // disable button
                 socket.emit('join_room', {'room': room.name, 'username': username});
                 // TODO: switch views
             };
@@ -39,7 +40,7 @@ $(document).ready(function() {
                              '<h4 class="room-name"></h4>' +
                              '<p class="room-users"></p>' +
                              '<p class="room-capacity"></p>' +
-                             '<button type="button" class="button" id="#join-' + rooms[i].name + '">Join</button>' +
+                             '<button type="button" class="join-button">Join</button>' +
                            '</div>';
             $('#rooms').append(roomHTML);
             $('#join-' + rooms[i].name).click(joinRoom(rooms[i]));
@@ -49,7 +50,7 @@ $(document).ready(function() {
 
     // Update name, users, and capacity text
     function updateRoom(room) {
-        var $room = $('#rooms #' + room.name);
+        var $room = $('#' + room.name);
         $room.children('.room-name').text(room.name);
         $room.children('.room-users').text('Users: ' + room.users.join(', '));
         $room.children('.room-capacity').text('Capacity: ' + room.users.length.toString());
