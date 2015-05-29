@@ -27,7 +27,7 @@ $(document).ready(function() {
     function displayRooms(rooms) {
         var joinRoom = function(room) {
             return function() {
-                var $room = $('#' + room.name);
+                var $room = $('#room-' + room.id);
                 $room.children('.join-button').prop('disabled', true); // disable button
                 socket.emit('join_room', {'room': room.name, 'username': username});
                 // TODO: switch views
@@ -36,21 +36,22 @@ $(document).ready(function() {
 
         $('#rooms').empty();
         for (var i = 0; i < rooms.length; i++) {
-            var roomHTML = '<div id="#' + rooms[i].name + '">' +
-                             '<h4 class="room-name"></h4>' +
-                             '<p class="room-users"></p>' +
-                             '<p class="room-capacity"></p>' +
-                             '<button type="button" class="join-button">Join</button>' +
+	    rooms[i].id = i;
+            var roomHTML = '<div id="room-' + i + '">' +
+                             '<h4 class="room-name">a</h4>' +
+                             '<p class="room-users">b</p>' +
+                             '<p class="room-capacity">c</p>' +
+                             '<button type="button" class="join-button" id="join-' + rooms[i].id + '">Join</button>' +
                            '</div>';
             $('#rooms').append(roomHTML);
-            $('#join-' + rooms[i].name).click(joinRoom(rooms[i]));
+            $('#join-' + rooms[i].id).click(joinRoom(rooms[i]));
             updateRoom(rooms[i]);
         }
     }
 
     // Update name, users, and capacity text
     function updateRoom(room) {
-        var $room = $('#' + room.name);
+        var $room = $('#room-' + room.id);
         $room.children('.room-name').text(room.name);
         $room.children('.room-users').text('Users: ' + room.users.join(', '));
         $room.children('.room-capacity').text('Capacity: ' + room.users.length.toString());
