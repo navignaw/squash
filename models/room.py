@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+from parse_rest.datatypes import Object
+
+
+class Room(Object):
+    """ Room for users to play a game. Limited to 6 """
+    MAX_CAPACITY = 6
+
+    class ExceededCapacityError(Exception):
+        pass
+
+    def add_user(self, user):
+        if len(self.users) == 6:
+            raise Room.ExceededCapacityError
+        self.users.append(user)
+
+    def remove_user(self, user):
+        try:
+            self.users.remove(user)
+        except ValueError:
+            pass
