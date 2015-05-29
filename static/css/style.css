@@ -1,0 +1,43 @@
+body {
+    background: #EEE;
+    font-family: Helvetica, sans-serif;
+}
+
+img#logo {
+    display: block;
+    margin: 10px auto;
+}
+
+form {
+    border: 2px solid #888;
+    margin: 10px auto;
+    padding: 15px;
+    width: 250px;
+    clear: both;
+    text-align: center;
+}
+
+legend {
+    margin: 5px auto;
+}
+
+fieldset {
+	 border: none;
+    padding: 10px;
+}
+
+label {
+    text-align: right;
+    width: 100px;
+    float: left;
+    margin: 2px 5px 0px 0px;
+}
+
+input.login-field {
+    width: 100px;
+    float: left;
+}
+
+input.button {
+    margin: 5px;
+}
