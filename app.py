@@ -48,20 +48,20 @@ def on_connect():
 @socketio.on('disconnect', namespace='/server')
 def on_disconnect():
     emit('response', {'data': 'Disconnection successful'})
-    if session['room']:
+    if session.get('room', ''):
         leave_socket_room()
 
 
 @socketio.on('client_connect', namespace='/server')
 def on_client_connect(data):
-    session[username] = data.username
-    print 'client connected:', data.username
+    session['username'] = data['username']
+    print 'client connected:', data['username']
 
 
 @socketio.on('join_room', namespace='/server')
 def on_join_room(data):
     username = session['username']
-    room = Room.Query.get(data['id'])
+    room = Room.Query.get(objectId=data['room'])
     try:
         room.add_user(username)
         room.save()
