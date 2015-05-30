@@ -28,13 +28,17 @@ def index():
 
 def leave_socket_room(room_id=''):
     username = session['username']
-    room = Room.Query.get(room_id or session['room'])
+    room = Room.Query.get(objectId=(room_id or session['room']))
+
+    # Doesn't seem to work after we leave the room, so do it now:
+    emit('response', {'data': username + ' has left the room.'}, room=room.name)
+
     room.remove_user(username)
+    room.save()
     leave_room(room.name)
     session['room'] = ''
     if room.is_empty:
         close_room(room.name)
-    emit('response', {'data': username + ' has left the room.'}, room=room.name)
     emit('update_room', room.to_dict(), broadcast=True)
 
 

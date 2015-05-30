@@ -38,7 +38,7 @@ $(document).ready(function() {
 
         $('#rooms').empty();
         for (var i = 0; i < rooms.length; i++) {
-            var roomHTML = '<div id="room-' + i + '">' +
+            var roomHTML = '<div id="room-' + rooms[i].id + '">' +
                              '<h4 class="room-name">a</h4>' +
                              '<p class="room-users">b</p>' +
                              '<p class="room-capacity">c</p>' +
