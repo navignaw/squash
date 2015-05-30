@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, close_room
 from parse_rest.connection import register
 
@@ -26,49 +26,56 @@ def index():
     return render_template('index.html')
 
 
+def leave_socket_room(room_id=''):
+    username = session['username']
+    room = Room.Query.get(room_id or session['room'])
+    room.remove_user(username)
+    leave_room(room.name)
+    session['room'] = ''
+    if room.is_empty:
+        close_room(room.name)
+    emit('response', {'data': username + ' has left the room.'}, room=room.name)
+    emit('update_room', room.to_dict(), broadcast=True)
+
+
 @socketio.on('connect', namespace='/server')
 def on_connect():
     emit('response', {'data': 'Connection successful'})
     rooms = Room.Query.all()
-    emit('load_rooms', {'rooms': [{'name': room.name, 'users': room.users} for room in rooms]})
+    emit('load_rooms', {'rooms': [room.to_dict() for room in rooms]})
 
 
 @socketio.on('disconnect', namespace='/server')
 def on_disconnect():
     emit('response', {'data': 'Disconnection successful'})
+    if session['room']:
+        leave_socket_room()
 
 
 @socketio.on('client_connect', namespace='/server')
 def on_client_connect(data):
-    print 'client connected:', data
+    session[username] = data.username
+    print 'client connected:', data.username
 
 
 @socketio.on('join_room', namespace='/server')
 def on_join_room(data):
-    username = data['username']
-    room_name = data['room']
-    room = Room.Query.get(name=room_name) or Room(name=room_name, users=[])
+    username = session['username']
+    room = Room.Query.get(data['id'])
     try:
         room.add_user(username)
         room.save()
-        join_room(room_name)
-        emit('response', {'data': username + ' has entered the room.'}, room=room_name)
-        emit('update_room', {'name': room_name, 'users': room.users}, broadcast=True)
+        join_room(room.name)
+        session['room'] = room.objectId
+        emit('response', {'data': username + ' has entered the room.'}, room=room.name)
+        emit('update_room', room.to_dict(), broadcast=True)
     except Room.ExceededCapacityError:
         emit('response', {'data': 'Error: room is full!'})
 
 
 @socketio.on('leave_room')
 def on_leave_room(data, namespace='/server'):
-    username = data['username']
-    room_name = data['room']
-    room = Room.Query.get(name=room_name)
-    room.remove_user(username)
-    leave_room(room_name)
-    if room.is_empty:
-        close_room(room_name)
-    emit('response', {'data': username + ' has left the room.'}, room=room)
-    emit('update_room', {'name': room_name, 'users': room.users}, broadcast=True)
+    leave_socket_room(room_id=data['room'])
 
 
 if __name__ == "__main__":

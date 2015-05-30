@@ -23,3 +23,10 @@ class Room(Object):
 
     def is_empty(self):
         return len(self.users) == 0
+
+    def to_dict(self):
+        return {
+            'id': self.objectId,
+            'name': self.name,
+            'users': self.users,
+        }
