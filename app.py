@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 import os
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, request, redirect, url_for
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, close_room
 from parse_rest.connection import register
 
 from models.room import *
+from models.player import *
+from models.loginform import *
 
 PARSE_APPLICATION_ID = 'LuuyCNuXJZZtMaZYaaV2PHilwjS82STGAVqJn3yu'
 PARSE_REST_API_KEY = 'JRtiYnNbKMXS2sXBTfGgDVRqJv9UDlKAAbHVdsyB'
@@ -24,6 +26,13 @@ register(PARSE_APPLICATION_ID, PARSE_REST_API_KEY, master_key=PARSE_MASTER_KEY)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        return redirect(url_for('index'))
+    return render_template('login.html', form=form)
 
 
 def leave_socket_room(room_id=''):

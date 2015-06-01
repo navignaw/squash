@@ -41,3 +41,8 @@ input.login-field {
 input.button {
     margin: 5px;
 }
+
+ul.errors {
+    color: red;
+    font-weight: bold;
+}

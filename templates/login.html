@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Squash</title>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+  </head>
+
+  <body>
+    <div class="heading">
+      <h1>Squash: the app</h1>
+      <h2>&lt;Albert's logo here&gt;</h2>
+    </div>
+
+    <form method="POST" action="/login">
+      <legend>Log in to start squashing!</legend>
+      {% if form.errors %}
+        <ul class="errors">
+	  {% for fieldName, fieldErrors in form.errors|dictsort if fieldErrors %}
+	    {% for error in fieldErrors %}
+	      <li>{{ form[fieldName].label }}: {{ error }}</li>
+	    {% endfor %}
+	  {% endfor %}
+	</ul>
+      {% endif %}
+      <fieldset>
+	<div>{{ form.username.label }}{{ form.username(class="login-field") }}</div>
+	<div>{{ form.password.label }}{{ form.password(class="login-field") }}</div>
+      </fieldset>
+      <input type="submit" value="squash squash" class="button" />
+    </form>
+  </body>
+</html>
