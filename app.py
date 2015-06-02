@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 import os
+
 from flask import Flask, render_template, session, request, redirect, url_for
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, close_room
+from flask.ext.login import LoginManager, login_user, logout_user, current_user, login_required
 from parse_rest.connection import register
 
 from models.room import *
 from models.player import *
 from models.loginform import *
+from models.registrationform import *
 
 PARSE_APPLICATION_ID = 'LuuyCNuXJZZtMaZYaaV2PHilwjS82STGAVqJn3yu'
 PARSE_REST_API_KEY = 'JRtiYnNbKMXS2sXBTfGgDVRqJv9UDlKAAbHVdsyB'
@@ -22,8 +25,17 @@ app.debug = True  # TODO: change this when we deploy
 socketio = SocketIO(app)
 register(PARSE_APPLICATION_ID, PARSE_REST_API_KEY, master_key=PARSE_MASTER_KEY)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(id):
+    return Player.getPlayer(objectId=id)
 
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html')
 
@@ -31,12 +43,25 @@ def index():
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
+        login_user(Player.getPlayer(username=form.username.data), remember=True)
         return redirect(url_for('index'))
     return render_template('login.html', form=form)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        form.registerUser()
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
 
 def leave_socket_room(room_id=''):
-    username = session['username']
+    username = current_user.username
     room = Room.Query.get(objectId=(room_id or session['room']))
 
     # Doesn't seem to work after we leave the room, so do it now:
@@ -67,13 +92,12 @@ def on_disconnect():
 
 @socketio.on('client_connect', namespace='/server')
 def on_client_connect(data):
-    session['username'] = data['username']
-    print 'client connected:', data['username']
+    print 'client connected:', current_user.username
 
 
 @socketio.on('join_room', namespace='/server')
 def on_join_room(data):
-    username = session['username']
+    username = current_user.username
     room = Room.Query.get(objectId=data['room'])
     try:
         room.add_user(username)

@@ -1,8 +1,10 @@
 Flask==0.10.1
 Flask-SocketIO==0.6.0
+Flask-Login==0.2.11
 Jinja2==2.7.3
 MarkupSafe==0.23
 Werkzeug==0.10.4
+WTForms==2.0.2
 gevent==1.0
 gevent-socketio==0.3.6
 gevent-websocket==0.9.5

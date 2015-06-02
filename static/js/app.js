@@ -2,11 +2,6 @@ $(document).ready(function() {
     var MAX_CAPACITY = 6;
     var namespace = '/server';
 
-    // TODO: for testing, just randomly pick a username. later let them customize
-    var username = ['david', 'albert', 'ivan', 'fat'][Math.floor(Math.random() * 4)];
-    $('#username').text('Hello, ' + username);
-
-
     var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
     socket.on('connect', function() {
         socket.emit('client_connect', {'username': username});

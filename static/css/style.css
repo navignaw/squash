@@ -11,10 +11,19 @@ img#logo {
 form {
     border: 2px solid #888;
     margin: 10px auto;
-    padding: 15px;
-    width: 250px;
+    padding: 10px;
+    width: 400px;
     clear: both;
     text-align: center;
+}
+
+form div {
+     display: block;
+}
+
+ul.errors {
+    margin: 5px;
+    text-align: left;
 }
 
 legend {
@@ -22,20 +31,19 @@ legend {
 }
 
 fieldset {
-	 border: none;
-    padding: 10px;
+    border: none;
+    padding: 5px;
 }
 
-label {
+label.login-field {
+    display: inline-block;
     text-align: right;
-    width: 100px;
-    float: left;
+    width: 140px;
     margin: 2px 5px 0px 0px;
 }
 
 input.login-field {
     width: 100px;
-    float: left;
 }
 
 input.button {
@@ -45,4 +53,5 @@ input.button {
 ul.errors {
     color: red;
     font-weight: bold;
+    margin: 0px;
 }

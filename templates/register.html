@@ -11,8 +11,8 @@
       <h2>&lt;Albert's logo here&gt;</h2>
     </div>
 
-    <form method="POST" action="/login">
-      <legend>Log in to start squashing!</legend>
+    <form method="POST" action="/register">
+      <legend>Register to become a squasher:</legend>
       {% if form.errors %}
         <ul class="errors">
 	  {% for fieldName, fieldErrors in form.errors|dictsort if fieldErrors %}
@@ -25,8 +25,10 @@
       <fieldset>
 	<div>{{ form.username.label(class="login-field") }}{{ form.username(class="login-field") }}</div>
 	<div>{{ form.password.label(class="login-field") }}{{ form.password(class="login-field") }}</div>
+	<div>{{ form.confirmPassword.label(class="login-field") }}{{ form.confirmPassword(class="login-field") }}</div>
+	<div>{{ form.conditions() }} <label for="conditions">I accept the <a href="javascript:window.open('/terms','Squash | Terms and Conditions','width=500,height=300')">Terms and Conditions</a>.</label></div>
       </fieldset>
-      <input type="submit" value="squash squash" class="button" />
+      <input type="submit" value="squash me" class="button" />
     </form>
   </body>
 </html>

@@ -4,17 +4,17 @@ from wtforms import Form, StringField, PasswordField, validators
 from wtforms.validators import ValidationError
 from models.player import *
 
-def checkUsername(form, field):
-    if not Player.getPlayer(field.data):
-        raise ValidationError('Username does not exist')
+def usernameExists(form, field):
+    if not Player.getPlayer(username=field.data):
+        raise ValidationError('Username does not exist.')
 
-def checkPassword(form, field):
-    player = Player.getPlayer(form.username.data)
+def correctPassword(form, field):
+    player = Player.getPlayer(username=form.username.data)
     if player and field.data != player.password:
-        raise ValidationError('Incorrect password')
+        raise ValidationError('Password is incorrect.')
 
 class LoginForm(Form):
-    username = StringField('Username', [checkUsername])
-    password = PasswordField('Password', [checkPassword])
+    username = StringField('Username', [usernameExists])
+    password = PasswordField('Password', [correctPassword])
 
     
