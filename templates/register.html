@@ -1,34 +1,28 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Squash</title>
-    <link rel="stylesheet" href="/static/css/style.css"/>
-  </head>
+{% extends "layout.html" %}
 
-  <body>
-    <div class="heading">
-      <h1>Squash: the app</h1>
-      <h2>&lt;Albert's logo here&gt;</h2>
-    </div>
+{% block title %}Register{% endblock %}
 
-    <form method="POST" action="/register">
-      <legend>Register to become a squasher:</legend>
-      {% if form.errors %}
-        <ul class="errors">
-	  {% for fieldName, fieldErrors in form.errors|dictsort if fieldErrors %}
-	    {% for error in fieldErrors %}
-	      <li>{{ form[fieldName].label }}: {{ error }}</li>
-	    {% endfor %}
-	  {% endfor %}
-	</ul>
-      {% endif %}
-      <fieldset>
-	<div>{{ form.username.label(class="login-field") }}{{ form.username(class="login-field") }}</div>
-	<div>{{ form.password.label(class="login-field") }}{{ form.password(class="login-field") }}</div>
-	<div>{{ form.confirmPassword.label(class="login-field") }}{{ form.confirmPassword(class="login-field") }}</div>
-	<div>{{ form.conditions() }} <label for="conditions">I accept the <a href="javascript:window.open('/terms','Squash | Terms and Conditions','width=500,height=300')">Terms and Conditions</a>.</label></div>
-      </fieldset>
-      <input type="submit" value="squash me" class="button" />
-    </form>
-  </body>
-</html>
+{% block content %}
+  <form method="POST" action="/register">
+    <legend>Register to become a squasher:</legend>
+    {% if form.errors %}
+      <ul class="errors">
+      {% for fieldName, fieldErrors in form.errors|dictsort if fieldErrors %}
+        {% for error in fieldErrors %}
+          <li>{{ form[fieldName].label }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <fieldset>
+    <div>{{ form.username.label(class="login-field") }}{{ form.username(class="login-field") }}</div>
+    <div>{{ form.password.label(class="login-field") }}{{ form.password(class="login-field") }}</div>
+    <div>{{ form.confirmPassword.label(class="login-field") }}{{ form.confirmPassword(class="login-field") }}</div>
+    <div>{{ form.conditions() }} <label for="conditions">I accept the <a href="javascript:window.open('/terms','Squash | Terms and Conditions','width=500,height=300')">Terms and Conditions</a>.</label></div>
+    </fieldset>
+    <input type="submit" value="squash me" class="button" />
+  </form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

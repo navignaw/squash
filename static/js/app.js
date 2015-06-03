@@ -4,7 +4,7 @@ $(document).ready(function() {
 
     var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
     socket.on('connect', function() {
-        socket.emit('client_connect', {'username': username});
+        console.log('client connected!');
     });
 
     socket.on('response', function(msg) {
