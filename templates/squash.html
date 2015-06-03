@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}Lobby{% endblock %}
+{% block title %}The Game{% endblock %}
 
 {% block content %}
-  <div id="rooms">
-    Loading rooms...
-  </div>
+  <div id="room"></div>
+
+  <a href="/">Return to Lobby</a>
 
   <div>
     <p>Log:</p>
@@ -15,5 +15,5 @@
 
 {% block scripts %}
   {{ super() }}
-  <script type="text/javascript" src="/static/js/app.js"></script>
+  <script type="text/javascript" src="/static/js/squash.js"></script>
 {% endblock %}

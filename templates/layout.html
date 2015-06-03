@@ -9,6 +9,16 @@
 
   <body>
     <div class="heading">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="alert-message">
+          {% for category, message in messages %}
+            <li class="alert-{{ category }}">{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
       {% block heading %}
         <h1>Squash: the app</h1>
         <h2>&lt;Albert's logo here&gt;</h2>
@@ -23,7 +33,6 @@
     {% block scripts %}
       <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
       <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-      <script type="text/javascript" src="/static/js/app.js"></script>
     {% endblock %}
   </body>
 </html>

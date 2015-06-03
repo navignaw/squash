@@ -4,8 +4,8 @@ from parse_rest.datatypes import Object
 
 class Player(Object):
     @staticmethod
-    def getPlayer(*args, **kwargs):
-        players = Player.Query.filter(*args, **kwargs)
+    def getPlayer(**kwargs):
+        players = Player.Query.filter(**kwargs)
         if players.count() == 1:
             return players.get()
         return None

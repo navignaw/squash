@@ -55,3 +55,14 @@ ul.errors {
     font-weight: bold;
     margin: 0px;
 }
+
+.alert-message {
+    /* TODO: style alerts */
+}
+
+.alert-error {
+    color: red;
+}
+.alert-success {
+    color: green;
+}

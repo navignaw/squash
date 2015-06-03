@@ -22,25 +22,15 @@ $(document).ready(function() {
 
     // Renders HTML for each room
     function displayRooms(rooms) {
-        var joinRoom = function(room) {
-            return function() {
-                var $room = $('#room-' + room.id);
-                $room.children('.join-button').prop('disabled', true); // disable button
-                socket.emit('join_room', {'room': room.id});
-                // TODO: switch views
-            };
-        };
-
         $('#rooms').empty();
         for (var i = 0; i < rooms.length; i++) {
             var roomHTML = '<div id="room-' + rooms[i].id + '">' +
                              '<h4 class="room-name">a</h4>' +
                              '<p class="room-users">b</p>' +
                              '<p class="room-capacity">c</p>' +
-                             '<button type="button" class="join-button" id="join-' + rooms[i].id + '">Join</button>' +
+                             '<a class="room-join" href="squash/room/' + rooms[i].id + '">Join</a>' +
                            '</div>';
             $('#rooms').append(roomHTML);
-            $('#join-' + rooms[i].id).click(joinRoom(rooms[i]));
             updateRoom(rooms[i]);
         }
     }
@@ -53,7 +43,7 @@ $(document).ready(function() {
         $room.children('.room-users').text('Users: ' + room.users.join(', '));
         $room.children('.room-capacity').text('Capacity: ' + capacity.toString() + (capacity == MAX_CAPACITY ? ' (FULL)' : ''));
         if (capacity == MAX_CAPACITY) {
-            $room.children('.join-button').prop('disabled', true); // disable button
+            $room.children('.room-join').prop('disabled', true); // disable link
         }
     }
 });

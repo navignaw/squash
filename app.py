@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, flash, render_template, session, request, redirect, url_for
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, close_room
 from flask.ext.login import LoginManager, login_user, logout_user, current_user, login_required
 from parse_rest.connection import register
@@ -34,6 +34,81 @@ login_manager.login_view = 'login'
 def load_user(id):
     return Player.getPlayer(objectId=id)
 
+
+# Socket helper functions
+def leave_socket_room(room_id=''):
+    """Leave a room on Parse and socketIO"""
+    username = current_user.username
+    room = Room.Query.get(objectId=(room_id or session['room']))
+
+    # Doesn't seem to work after we leave the room, so do it now:
+    emit('response', {'data': username + ' has left the room.'}, room=room_id)
+
+    room.remove_user(username)
+    room.save()
+    leave_room(room.objectId)
+    session['room'] = ''
+    if room.is_empty:
+        close_room(room.objectId)
+    emit('update_room', room.to_dict(), broadcast=True)
+
+def join_socket_room(room_id):
+    """Join a room on socketIO"""
+    room = Room.Query.get(objectId=room_id)
+    join_room(room_id)
+    emit('response', {'data': current_user.username + ' has entered the room.'}, room=room_id)
+    emit('update_room', room.to_dict(), broadcast=True)
+
+def join_parse_room(room_id):
+    """
+    Join a room on Parse; may raise Room.ExceededCapacityError.
+    Note: joining the socketIO room is separated from this function as it
+          must be called via sockets
+    """
+    room = Room.Query.get(objectId=room_id)
+    room.add_user(current_user.username)
+    room.save()
+    session['room'] = room.objectId
+
+
+@socketio.on('connect', namespace='/server')
+def on_connect():
+    print 'client connected:', current_user.username
+    emit('response', {'data': 'Connection successful'})
+    rooms = Room.Query.all()
+    emit('load_rooms', {'rooms': [room.to_dict() for room in rooms]})
+
+@socketio.on('connect', namespace='/squash')
+def on_connect():
+    print 'client connected:', current_user.username
+    emit('response', {'data': 'Connection successful'})
+    room = Room.Query.get(objectId=session['room'])
+    emit('load_room', room.to_dict())
+    join_socket_room(room.objectId)
+
+
+@socketio.on('disconnect', namespace='/server')
+def on_disconnect():
+    print 'client disconnected:', current_user.username
+    emit('response', {'data': 'Disconnection successful'})
+
+@socketio.on('disconnect', namespace='/squash')
+def on_disconnect():
+    print 'client disconnected:', current_user.username
+    emit('response', {'data': 'Disconnection successful'})
+    if session.get('room', ''):
+        leave_socket_room()
+
+@socketio.on('join_room')
+def on_join_room(data, namespace='/squash'):
+    join_socket_room(data['room'])
+
+@socketio.on('leave_room')
+def on_leave_room(data, namespace='/squash'):
+    leave_socket_room(room_id=data['room'])
+
+
+# Routes
 @app.route('/')
 @login_required
 def index():
@@ -44,6 +119,7 @@ def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         login_user(Player.getPlayer(username=form.username.data), remember=True)
+        flash('Logged in successfully.', 'success')
         return redirect(url_for('index'))
     if current_user.is_authenticated():
       return redirect(url_for('index'))
@@ -53,6 +129,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash('Logged out successfully.', 'success')
     return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -60,6 +137,7 @@ def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         form.registerUser()
+        flash('User registered successfully.', 'success')
         return redirect(url_for('login'))
     if current_user.is_authenticated():
       return redirect(url_for('index'))
@@ -70,57 +148,16 @@ def register():
 def terms():
     return render_template('terms.html')
 
-
-def leave_socket_room(room_id=''):
-    username = current_user.username
-    room = Room.Query.get(objectId=(room_id or session['room']))
-
-    # Doesn't seem to work after we leave the room, so do it now:
-    emit('response', {'data': username + ' has left the room.'}, room=room.name)
-
-    room.remove_user(username)
-    room.save()
-    leave_room(room.name)
-    session['room'] = ''
-    if room.is_empty:
-        close_room(room.name)
-    emit('update_room', room.to_dict(), broadcast=True)
-
-
-@socketio.on('connect', namespace='/server')
-def on_connect():
-    print 'client connected:', current_user.username
-    emit('response', {'data': 'Connection successful'})
-    rooms = Room.Query.all()
-    emit('load_rooms', {'rooms': [room.to_dict() for room in rooms]})
-
-
-@socketio.on('disconnect', namespace='/server')
-def on_disconnect():
-    print 'client disconnected:', current_user.username
-    emit('response', {'data': 'Disconnection successful'})
-    if session.get('room', ''):
-        leave_socket_room()
-
-
-@socketio.on('join_room', namespace='/server')
-def on_join_room(data):
-    username = current_user.username
-    room = Room.Query.get(objectId=data['room'])
+@app.route('/squash/room/<room_id>')
+@login_required
+def squash(room_id):
     try:
-        room.add_user(username)
-        room.save()
-        join_room(room.name)
-        session['room'] = room.objectId
-        emit('response', {'data': username + ' has entered the room.'}, room=room.name)
-        emit('update_room', room.to_dict(), broadcast=True)
+      join_parse_room(room_id)
     except Room.ExceededCapacityError:
-        emit('response', {'data': 'Error: room is full!'})
-
-
-@socketio.on('leave_room')
-def on_leave_room(data, namespace='/server'):
-    leave_socket_room(room_id=data['room'])
+      error = 'The room you tried to join is full.'
+      flash('The room you tried to join is full.', 'error')
+      return redirect(url_for('index'))
+    return render_template('squash.html')
 
 
 if __name__ == "__main__":
