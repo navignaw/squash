@@ -45,7 +45,15 @@ def login():
     if request.method == 'POST' and form.validate():
         login_user(Player.getPlayer(username=form.username.data), remember=True)
         return redirect(url_for('index'))
+    if current_user.is_authenticated():
+      return redirect(url_for('index'))
     return render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -53,7 +61,10 @@ def register():
     if request.method == 'POST' and form.validate():
         form.registerUser()
         return redirect(url_for('login'))
+    if current_user.is_authenticated():
+      return redirect(url_for('index'))
     return render_template('register.html', form=form)
+
 
 @app.route('/terms')
 def terms():
@@ -78,6 +89,7 @@ def leave_socket_room(room_id=''):
 
 @socketio.on('connect', namespace='/server')
 def on_connect():
+    print 'client connected:', current_user.username
     emit('response', {'data': 'Connection successful'})
     rooms = Room.Query.all()
     emit('load_rooms', {'rooms': [room.to_dict() for room in rooms]})
@@ -85,14 +97,10 @@ def on_connect():
 
 @socketio.on('disconnect', namespace='/server')
 def on_disconnect():
+    print 'client disconnected:', current_user.username
     emit('response', {'data': 'Disconnection successful'})
     if session.get('room', ''):
         leave_socket_room()
-
-
-@socketio.on('client_connect', namespace='/server')
-def on_client_connect(data):
-    print 'client connected:', current_user.username
 
 
 @socketio.on('join_room', namespace='/server')
