@@ -1,5 +1,7 @@
 $(document).ready(function() {
+    var MAX_CAPACITY = 6;
     var namespace = '/squash';
+    var gameBegan = false;
 
     var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
     socket.on('connect', function() {
@@ -10,28 +12,30 @@ $(document).ready(function() {
         $('#log').append('<li>' + msg.data + '</li>');
     });
 
-    socket.on('load_room', function(room) {
-        displayRoom(room);
-    });
-
     socket.on('update_room', function(room) {
         updateRoom(room);
     });
 
 
-    // Renders HTML for each room
-    function displayRoom(room) {
-        var roomHTML = '<h4 class="room-name">a</h4>' +
-                       '<p class="room-users">b</p>';
-        $('#room').append(roomHTML);
-        updateRoom(room);
-    }
-
     // Update name, users, and capacity text
     function updateRoom(room) {
         var $room = $('#room');
         var capacity = room.users.length;
-        $room.children('.room-name').text(room.name);
-        $room.children('.room-users').text('Users: ' + room.users.join(', '));
+        $room.find('.room-name').text(room.name);
+        $room.find('.room-users').text('Users: ' + room.users.join(', '));
+        $room.find('.remaining').text((MAX_CAPACITY - capacity).toString());
+        if (capacity === MAX_CAPACITY) {
+            // TODO: ready to begin game
+            if (!gameBegan) {
+                $room.find('#game-status').text('Ready to begin!');
+                gameBegan = true;
+            }
+        } else if (gameBegan) {
+            // TODO: uh oh, we lost a player. pause the game?
+            $room.find('#game-status').text(
+                'Waiting for ' + (MAX_CAPACITY - capacity).toString() +
+                ' more players...'
+            );
+        }
     }
 });

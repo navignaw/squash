@@ -3,9 +3,20 @@
 {% block title %}The Game{% endblock %}
 
 {% block content %}
-  <div id="room"></div>
+  <div id="room">
+    <div id="room-title">
+      <h4 class="room-name">{{ room.name }}</h4>
+      <p class="room-users">Users: {{ room.users|join(', ') }}</p>
+    </div>
 
-  <a href="/">Return to Lobby</a>
+    <div id="room-content">
+      <p id="game-status">
+        Waiting for <span class="remaining"></span> more players...
+      </p>
+    </div>
+
+    <a class="bottom" href="/">Return to Lobby</a>
+  </div>
 
   <div>
     <p>Log:</p>

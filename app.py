@@ -39,7 +39,7 @@ def load_user(id):
 def leave_socket_room(room_id=''):
     """Leave a room on Parse and socketIO"""
     username = current_user.username
-    room = Room.Query.get(objectId=(room_id or session['room']))
+    room = Room.getRoom(objectId=(room_id or session['room']))
 
     # Doesn't seem to work after we leave the room, so do it now:
     emit('response', {'data': username + ' has left the room.'}, room=room_id)
@@ -54,21 +54,22 @@ def leave_socket_room(room_id=''):
 
 def join_socket_room(room_id):
     """Join a room on socketIO"""
-    room = Room.Query.get(objectId=room_id)
+    room = Room.getRoom(objectId=room_id)
     join_room(room_id)
     emit('response', {'data': current_user.username + ' has entered the room.'}, room=room_id)
     emit('update_room', room.to_dict(), broadcast=True)
 
 def join_parse_room(room_id):
     """
-    Join a room on Parse; may raise Room.ExceededCapacityError.
+    Join a room on Parse; may raise ExceededCapacityError or DoesNotExistError.
     Note: joining the socketIO room is separated from this function as it
           must be called via sockets
     """
-    room = Room.Query.get(objectId=room_id)
+    room = Room.getRoom(objectId=room_id)
     room.add_user(current_user.username)
     room.save()
     session['room'] = room.objectId
+    return room
 
 
 @socketio.on('connect', namespace='/server')
@@ -82,7 +83,7 @@ def on_connect():
 def on_connect():
     print 'client connected:', current_user.username
     emit('response', {'data': 'Connection successful'})
-    room = Room.Query.get(objectId=session['room'])
+    room = Room.getRoom(objectId=session['room'])
     emit('load_room', room.to_dict())
     join_socket_room(room.objectId)
 
@@ -152,12 +153,11 @@ def terms():
 @login_required
 def squash(room_id):
     try:
-      join_parse_room(room_id)
-    except Room.ExceededCapacityError:
-      error = 'The room you tried to join is full.'
-      flash('The room you tried to join is full.', 'error')
+      room = join_parse_room(room_id)
+    except (Room.ExceededCapacityError, Room.DoesNotExistError) as e:
+      flash(e.message, 'error')
       return redirect(url_for('index'))
-    return render_template('squash.html')
+    return render_template('squash.html', room=room.to_dict())
 
 
 if __name__ == "__main__":

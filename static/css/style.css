@@ -82,7 +82,7 @@ input.button {
 }
 
 
-/* Rooms */
+/* Rooms (lobby) */
 .room {
     display: inline-block;
     position: relative;
@@ -102,7 +102,7 @@ input.button {
     margin-bottom: -5px;
 }
 
-.room-join {
+.room-join, .bottom {
     position: absolute;
     bottom: 10px;
     left: 30px;
@@ -125,4 +125,16 @@ a.button.disabled {
     cursor: default;
     color: gray;
     background-color: lightgray;
+}
+
+
+/* Squash game */
+#room {
+    position: relative;
+    width: 80%;
+    height: 400px;
+    margin: 10px auto;
+    padding: 5px 10px;
+    border: 1px #666 solid;
+    border-radius: 5px;
 }

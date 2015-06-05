@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from parse_rest.datatypes import Object
+from parse_rest.query import QueryResourceDoesNotExist
 
 
 class Room(Object):
@@ -8,9 +9,23 @@ class Room(Object):
     MAX_CAPACITY = 6
 
     class ExceededCapacityError(Exception):
-        pass
+        def __init__(self):
+            self.message = 'The room you tried to join is full.'
+
+    class DoesNotExistError(Exception):
+        def __init__(self):
+            self.message = 'The room does not exist.'
+
+    @staticmethod
+    def getRoom(**kwargs):
+        try:
+            return Room.Query.get(**kwargs)
+        except QueryResourceDoesNotExist:
+            raise Room.DoesNotExistError
 
     def add_user(self, user):
+        if user in self.users:
+            return
         if len(self.users) == self.MAX_CAPACITY:
             raise self.ExceededCapacityError
         self.users.append(user)
