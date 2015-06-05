@@ -9,7 +9,7 @@
       <ul class="errors">
       {% for fieldName, fieldErrors in form.errors|dictsort if fieldErrors %}
         {% for error in fieldErrors %}
-          <li>{{ form[fieldName].label }}: {{ error }}</li>
+          <li>Error: {{ error }}</li>
         {% endfor %}
       {% endfor %}
     </ul>

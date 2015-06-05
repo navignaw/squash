@@ -1,6 +1,8 @@
+/* General styling */
 body {
     background: #EEE;
     font-family: Helvetica, sans-serif;
+    margin: 20px 40px;
 }
 
 img#logo {
@@ -8,11 +10,18 @@ img#logo {
     margin: 10px auto;
 }
 
+.heading {
+    margin-bottom: 30px;
+}
+
+
+/* Registration and login forms */
 form {
-    border: 2px solid #888;
+    border: 1px solid #888;
+    border-radius: 5px;
     margin: 10px auto;
-    padding: 10px;
-    width: 400px;
+    padding: 20px;
+    width: 350px;
     clear: both;
     text-align: center;
 }
@@ -22,8 +31,10 @@ form div {
 }
 
 ul.errors {
+    color: red;
     margin: 5px;
     text-align: left;
+    font-weight: bold;
 }
 
 legend {
@@ -50,19 +61,68 @@ input.button {
     margin: 5px;
 }
 
-ul.errors {
-    color: red;
-    font-weight: bold;
-    margin: 0px;
-}
 
+/* Alerts */
 .alert-message {
-    /* TODO: style alerts */
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 5px;
 }
 
 .alert-error {
-    color: red;
+    color: darkred;
+    border-color: darkred;
+    background-color: #f78282;
 }
 .alert-success {
     color: green;
+    border-color: green;
+    background-color: #aad6aa;
+}
+
+
+/* Rooms */
+.room {
+    display: inline-block;
+    position: relative;
+    min-width: 150px;
+    max-width: 200px;
+    height: 150px;
+    margin: 10px;
+    padding: 0 20px;
+    border: 1px #666 solid;
+    border-radius: 5px;
+    vertical-align: bottom;
+}
+
+.room-name {
+    display: inline-block;
+    margin-top: 5px;
+    margin-bottom: -5px;
+}
+
+.room-join {
+    position: absolute;
+    bottom: 10px;
+    left: 30px;
+}
+
+a.button {
+    padding: 5px 10px;
+    border: 1px #666 solid;
+    border-radius: 5px;
+    background-color: #aad6aa;
+    color: black;
+    text-decoration: none;
+}
+a.button:hover {
+    background-color: #99c599;
+}
+
+a.button.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: gray;
+    background-color: lightgray;
 }

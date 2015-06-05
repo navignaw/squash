@@ -11,11 +11,11 @@
     <div class="heading">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-          <ul class="alert-message">
+          <div class="alerts">
           {% for category, message in messages %}
-            <li class="alert-{{ category }}">{{ message }}</li>
+            <div class="alert-message alert-{{ category }}">{{ message }}</div>
           {% endfor %}
-          </ul>
+          </div>
         {% endif %}
       {% endwith %}
 
