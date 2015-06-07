@@ -4,6 +4,7 @@
 
 {% block content %}
   <div id="room">
+    <input id="room-id" value={{ room.id }} hidden="true /">
     <div id="room-title">
       <h4 class="room-name">{{ room.name }}</h4>
       <p class="room-users">Users: {{ room.users|join(', ') }}</p>

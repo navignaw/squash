@@ -2,10 +2,12 @@ $(document).ready(function() {
     var MAX_CAPACITY = 6;
     var namespace = '/squash';
     var gameBegan = false;
+    var room_id = $('#room-id').val();
 
     var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
     socket.on('connect', function() {
         console.log('client connected!');
+        socket.emit('join_room', {room: room_id});
     });
 
     socket.on('response', function(msg) {
@@ -38,4 +40,11 @@ $(document).ready(function() {
             );
         }
     }
+
+    // Leave room when player leaves page.
+    // FIXME: player will leave and rejoin quickly on page refresh,
+    // but it works as a hack for now.
+    window.onbeforeunload = function() {
+        socket.emit('leave_room', {room: room_id});
+    };
 });

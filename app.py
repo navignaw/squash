@@ -100,12 +100,12 @@ def on_disconnect():
     if session.get('room', ''):
         leave_socket_room()
 
-@socketio.on('join_room')
-def on_join_room(data, namespace='/squash'):
+@socketio.on('join_room', namespace='/squash')
+def on_join_room(data):
     join_socket_room(data['room'])
 
-@socketio.on('leave_room')
-def on_leave_room(data, namespace='/squash'):
+@socketio.on('leave_room', namespace='/squash')
+def on_leave_room(data):
     leave_socket_room(room_id=data['room'])
 
 
