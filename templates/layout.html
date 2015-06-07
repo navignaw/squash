@@ -23,7 +23,7 @@
         <h1>Squash: the app</h1>
         <h2>&lt;Albert's logo here&gt;</h2>
         {% if current_user.is_authenticated() %}
-          Hello, {{ current_user.username }}! <a href="logout">Log out</a>
+          Hello, {{ current_user.username }}! <a href={{ url_for('logout') }} >Log out</a>
         {% endif %}
       {% endblock %}
     </div>

@@ -12,11 +12,11 @@
 
     <div id="room-content">
       <p id="game-status">
-        Waiting for <span class="remaining"></span> more players...
+        Loading fatties...
       </p>
     </div>
 
-    <a class="bottom" href="/">Return to Lobby</a>
+    <a class="bottom" id="leave-room" href={{ url_for('index', lobby=true) }}>Return to Lobby</a>
   </div>
 
   <div>

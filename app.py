@@ -36,10 +36,10 @@ def load_user(id):
 
 
 # Socket helper functions
-def leave_socket_room(room_id=''):
+def leave_socket_room(room_id):
     """Leave a room on Parse and socketIO"""
     username = current_user.username
-    room = Room.getRoom(objectId=(room_id or session['room']))
+    room = Room.getRoom(objectId=room_id)
 
     # Doesn't seem to work after we leave the room, so do it now:
     emit('response', {'data': username + ' has left the room.'}, room=room_id)
@@ -50,14 +50,14 @@ def leave_socket_room(room_id=''):
     session['room'] = ''
     if room.is_empty:
         close_room(room.objectId)
-    emit('update_room', room.to_dict(), broadcast=True)
+    emit('update_room', room.to_dict(), room=room_id, broadcast=True)
 
 def join_socket_room(room_id):
     """Join a room on socketIO"""
     room = Room.getRoom(objectId=room_id)
     join_room(room_id)
     emit('response', {'data': current_user.username + ' has entered the room.'}, room=room_id)
-    emit('update_room', room.to_dict(), broadcast=True)
+    emit('update_room', room.to_dict(), room=room_id, broadcast=True)
 
 def join_parse_room(room_id):
     """
@@ -97,8 +97,6 @@ def on_disconnect():
 def on_disconnect():
     print 'client disconnected:', current_user.username
     emit('response', {'data': 'Disconnection successful'})
-    if session.get('room', ''):
-        leave_socket_room()
 
 @socketio.on('join_room', namespace='/squash')
 def on_join_room(data):
@@ -106,13 +104,15 @@ def on_join_room(data):
 
 @socketio.on('leave_room', namespace='/squash')
 def on_leave_room(data):
-    leave_socket_room(room_id=data['room'])
+    leave_socket_room(data['room'])
 
 
 # Routes
 @app.route('/')
 @login_required
 def index():
+    if 'lobby' not in request.args and session.get('room', ''):
+        return redirect(url_for('squash', room_id=session['room']))
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
